@@ -1,14 +1,29 @@
 function make_det_table (data){
 
-    var new_data = _.where(data, {cd: "1001"});
+    var new_data = _.where(data, {class_group: "EC", class_lvl: "4"})
 
-    var columns = _.without(data.columns,"cd", "POSTER_URL", "CAR_CHC_ID", "POSITIONS_AVAILABLE", "tot_in");
+    var columns = data.columns;
 
-    var headers = ["SELECTION PROCESS NUMBER", "Organisation Code", "Classification", "Various Work Location", "Applications Submitted"];
+    var headers = ["Organisation",
+        "Group",
+        "Level",
+        "Language",
+        "Region",
+        "Number of positions",
+        "Area of selection",
+        "Code",
+        "Selection Process Number",
+        "Title",
+        "Close Date",
+        "Number of applications",
+        "url",
+        "NOC",
+        "NAPA",
+        "NOC minus NAPA"];
 
-    var table = d3.select('#adv_det_div')
+    var table = d3.select('#NOC_NAPA_div')
         .append('table')
-        .attr("id", "det_adv_tbl")
+        .attr("id", "NOC_NAPA_tbl")
         .attr("class","table table-striped table-hover")
 
     var thead = table.append('thead');
@@ -42,21 +57,17 @@ function make_det_table (data){
         .selectAll('td')
         .data(function (row) {
             return columns.map(function (column) {
-                var comafmt = d3.format(",d");
-                var pctformat = d3.format(",.1%");
-
-                new_val = ( _.contains(["value", "LMI_value", "PS_value"],column ) ? comafmt(row[column]) : column === "share" ? pctformat(row[column]) : row[column]);
-
                 return {
                     column: column,
-                    value: new_val,
-                    link: row["POSTER_URL"] };
+                    value: row[column],
+                    link: row["url"] };
             });
         })
         .enter()
         .append('td')
         .html(function (d) {
-            if(d.column === "SELECTION_PROCESS_NUMBER"){
+
+            if(d.column === "Selection Process Number"){
                 var new_sel_proc = "<a href=" + d.link + " target=\"_blank\">"+ d.value+ "</a>";
                 return new_sel_proc;
             }
@@ -65,9 +76,10 @@ function make_det_table (data){
             }
         });
 
-    $('#det_adv_tbl').DataTable({
+    $('#NOC_NAPA_tbl').DataTable({
+        "scrollX": true,
         "paging": true,
-        "searching": false
+        "searching": true
     });
 
 }
@@ -76,7 +88,7 @@ function make_det_table (data){
 function update_det_table (d, columns){
 
 
-        $('#det_adv_tbl').DataTable().destroy();
+        $('#NOC_NAPA_tbl').DataTable().destroy();
 
         var sorted_data = _.sortBy(d, 'applications');
 
@@ -92,20 +104,15 @@ function update_det_table (d, columns){
 
         var new_tds = rows_grp_u.merge(rows_grp_enter_u).selectAll('td').data(function (row) {
             return columns.map(function (column) {
-                var comafmt = d3.format(",d");
-                var pctformat = d3.format(",.1%");
-
-                new_val = ( _.contains(["value", "LMI_value", "PS_value"],column ) ? comafmt(row[column]) : column === "share" ? pctformat(row[column]) : row[column]);
-
                 return {
                     column: column,
-                    value: new_val,
+                    value: row[column],
                     link:row["url"] };
             });
         });
 
         new_tds.html(function (d) {
-            if(d.column === "SELECTION_PROCESS_NUMBER"){
+            if(d.column === "sel_process_nbr"){
                 var new_sel_proc = "<a href=" + d.link + " target=\"_blank\">"+ d.value+ "</a>";
                 return new_sel_proc;
             }else {
@@ -114,7 +121,7 @@ function update_det_table (d, columns){
         });
 
         new_tds.enter().append('td').html(function (d) {
-            if(d.column === "SELECTION_PROCESS_NUMBER"){
+            if(d.column === "sel_process_nbr"){
                 var new_sel_proc = "<a href=" + d.link + " target=\"_blank\">"+ d.value+ "</a>";
                 return new_sel_proc;
             }else {
@@ -123,9 +130,11 @@ function update_det_table (d, columns){
         });
 
 
-        $('#det_adv_tbl').DataTable({
+        $('#NOC_NAPA_tbl').DataTable({
+            "scrollY": "200px",
+            "scrollX": true,
             "paging": true,
-            "searching": false
+            "searching": true
         });
 
     };
